@@ -1,0 +1,83 @@
+{
+  "schemaVersion": 1,
+  "templateId": "inventory",
+  "locale": "pt-BR",
+  "branding": {
+    "name": "Base Estoque",
+    "shortName": "BE",
+    "tagline": "TUDO NO LUGAR CERTO"
+  },
+  "theme": {
+    "mode": "light",
+    "accent": "#267a67",
+    "accentText": "#ffffff",
+    "background": "#f4f6f8",
+    "surface": "#ffffff",
+    "text": "#18232d",
+    "muted": "#73808e",
+    "line": "#152a3b12",
+    "serif": false,
+    "radius": 14
+  },
+  "content": {
+    "headline": "Estoque sob controle.",
+    "description": "Acompanhe produtos, entradas e os próximos pedidos.",
+    "eyebrow": "TUDO NO LUGAR CERTO",
+    "cta": "Começar agora",
+    "heroImage": ""
+  },
+  "collections": {
+    "items": [
+      {
+        "id": "1",
+        "title": "Caderno Grid A5",
+        "subtitle": "PAP-001",
+        "category": "Papelaria",
+        "quantity": 84,
+        "price": 29.9,
+        "status": "Normal",
+        "location": "A-01"
+      },
+      {
+        "id": "2",
+        "title": "Caneta Studio",
+        "subtitle": "PAP-002",
+        "category": "Papelaria",
+        "quantity": 8,
+        "price": 14.9,
+        "status": "Baixo estoque",
+        "location": "A-02"
+      },
+      {
+        "id": "3",
+        "title": "Fone Studio One",
+        "subtitle": "ELE-003",
+        "category": "Eletrônicos",
+        "quantity": 23,
+        "price": 689,
+        "status": "Normal",
+        "location": "B-01"
+      },
+      {
+        "id": "4",
+        "title": "Luminária de mesa",
+        "subtitle": "DEC-004",
+        "category": "Decoração",
+        "quantity": 0,
+        "price": 189,
+        "status": "Esgotado",
+        "location": "C-02"
+      },
+      {
+        "id": "5",
+        "title": "Organizador modular",
+        "subtitle": "DEC-005",
+        "category": "Decoração",
+        "quantity": 41,
+        "price": 79,
+        "status": "Normal",
+        "location": "C-01"
+      }
+    ]
+  }
+}
