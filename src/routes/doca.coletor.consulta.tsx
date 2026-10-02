@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { ArrowLeft, Search as SearchIcon, Camera, BookOpen } from "lucide-react";
+import { ArrowLeft, Search as SearchIcon, Camera, BookOpen, X } from "lucide-react";
 import { useAuthUser } from "@/lib/useAuthUser";
 import { supabase } from "@/integrations/supabase/client";
 import { formatarDif, formatarPercentualDif, formatarMatriculaNome, labelStatus } from "@/lib/doca/rules";
@@ -43,6 +43,8 @@ function ConsultaPage() {
   const [resultados, setResultados] = useState<ResultadoConsulta[] | null>(null);
   const [separadores, setSeparadores] = useState<Record<string, { cd_funcionario: number; nm_funcionario: string }[]>>({});
   const [erro, setErro] = useState<string | null>(null);
+  const [vendoFotos, setVendoFotos] = useState<ResultadoConsulta | null>(null);
+  const [vendoObs, setVendoObs] = useState<ResultadoConsulta | null>(null);
 
   useEffect(() => {
     if (!loading && !user) navigate({ to: "/auth" });
@@ -193,17 +195,133 @@ function ConsultaPage() {
               </p>
               <p className="text-xs text-muted-foreground">Bipado em {formatarDataHora(r.data_hora_finalizacao)}</p>
               <div className="flex gap-2 pt-1">
-                <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
+                <button
+                  type="button"
+                  onClick={() => setVendoFotos(r)}
+                  className="inline-flex items-center gap-1 text-xs text-primary underline-offset-2 hover:underline"
+                >
                   <Camera className="size-3.5" /> Fotos
-                </span>
-                <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setVendoObs(r)}
+                  className="inline-flex items-center gap-1 text-xs text-primary underline-offset-2 hover:underline"
+                >
                   <BookOpen className="size-3.5" /> Observações
-                </span>
+                </button>
               </div>
             </div>
           );
         })}
       </div>
+
+      {vendoFotos && <ModalFotosConsulta resultado={vendoFotos} onClose={() => setVendoFotos(null)} />}
+      {vendoObs && <ModalObservacoesConsulta resultado={vendoObs} onClose={() => setVendoObs(null)} />}
     </main>
+  );
+}
+
+function ModalFotosConsulta({ resultado, onClose }: { resultado: ResultadoConsulta; onClose: () => void }) {
+  const [fotos, setFotos] = useState<{ id: string; url: string | null }[] | null>(null);
+  const [erro, setErro] = useState<string | null>(null);
+
+  useEffect(() => {
+    supabase
+      .from("doca_auditoria_fotos")
+      .select("id, url")
+      .eq("auditoria_id", resultado.id)
+      .is("deleted_at", null)
+      .then(({ data, error }) => {
+        if (error) {
+          setErro("Não foi possível carregar as fotos.");
+          return;
+        }
+        setFotos((data ?? []) as { id: string; url: string | null }[]);
+      });
+  }, [resultado.id]);
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+      <div className="w-full max-w-md max-h-[80vh] overflow-y-auto rounded-xl bg-card border border-border p-5 space-y-4">
+        <div className="flex items-center justify-between">
+          <h2 className="text-base font-semibold text-foreground">Fotos — Pedido {resultado.pedido}</h2>
+          <button onClick={onClose} className="rounded-md p-1 text-muted-foreground hover:bg-muted">
+            <X className="size-5" />
+          </button>
+        </div>
+        {erro && <p className="text-sm text-destructive">{erro}</p>}
+        {fotos === null && !erro && <p className="text-sm text-muted-foreground">Carregando fotos...</p>}
+        {fotos !== null && fotos.length === 0 && (
+          <p className="text-sm text-muted-foreground">Nenhuma foto registrada para esta auditoria.</p>
+        )}
+        <div className="grid grid-cols-2 gap-3">
+          {fotos?.map((f) =>
+            f.url ? (
+              <a key={f.id} href={f.url} target="_blank" rel="noreferrer" className="block rounded-lg overflow-hidden border border-border">
+                <img src={f.url} alt={`Foto do fardo - pedido ${resultado.pedido}`} className="w-full h-32 object-cover" />
+              </a>
+            ) : null,
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ModalObservacoesConsulta({ resultado, onClose }: { resultado: ResultadoConsulta; onClose: () => void }) {
+  const [obs, setObs] = useState<{ id: string; observacao: string; matricula: string | null; nome: string | null; created_at: string }[] | null>(null);
+  const [erro, setErro] = useState<string | null>(null);
+
+  useEffect(() => {
+    supabase
+      .from("doca_auditoria_observacoes")
+      .select("id, observacao, matricula, nome, created_at")
+      .eq("auditoria_id", resultado.id)
+      .is("deleted_at", null)
+      .order("created_at", { ascending: true })
+      .then(({ data, error }) => {
+        if (error) {
+          setErro("Não foi possível carregar as observações.");
+          return;
+        }
+        setObs(
+          (data ?? []) as {
+            id: string;
+            observacao: string;
+            matricula: string | null;
+            nome: string | null;
+            created_at: string;
+          }[],
+        );
+      });
+  }, [resultado.id]);
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+      <div className="w-full max-w-md max-h-[80vh] overflow-y-auto rounded-xl bg-card border border-border p-5 space-y-4">
+        <div className="flex items-center justify-between">
+          <h2 className="text-base font-semibold text-foreground">Observações — Pedido {resultado.pedido}</h2>
+          <button onClick={onClose} className="rounded-md p-1 text-muted-foreground hover:bg-muted">
+            <X className="size-5" />
+          </button>
+        </div>
+        {erro && <p className="text-sm text-destructive">{erro}</p>}
+        {obs === null && !erro && <p className="text-sm text-muted-foreground">Carregando observações...</p>}
+        {obs !== null && obs.length === 0 && (
+          <p className="text-sm text-muted-foreground">Nenhuma observação registrada para esta auditoria.</p>
+        )}
+        <ul className="space-y-2">
+          {obs?.map((o) => (
+            <li key={o.id} className="rounded-md bg-muted/40 p-3 text-sm">
+              <div className="flex justify-between text-xs text-muted-foreground">
+                <span>{o.matricula && o.nome ? `${o.matricula} - ${o.nome}` : "-"}</span>
+                <span>{new Date(o.created_at).toLocaleString("pt-BR")}</span>
+              </div>
+              <p className="text-foreground mt-1">{o.observacao}</p>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
   );
 }
