@@ -48,20 +48,54 @@ function AuditarPage() {
     try {
       const termo = busca.trim();
       const numTermo = isNaN(Number(termo)) ? -1 : Number(termo);
-      const query = supabase
+      let pedidoDocaId: string | null = null;
+
+      const { data: direto } = await supabase
         .from("pedidos_doca")
         .select("id, nu_pedido_origem, nu_doc_erp, cd_rota, cd_classe, qtde_contar")
+        .or(`nu_pedido_origem.eq.${termo},cd_rota.eq.${numTermo},nu_doc_erp.eq.${termo}`)
         .limit(1);
-      const { data } = await query.or(
-        `nu_pedido_origem.eq.${termo},cd_rota.eq.${numTermo},nu_doc_erp.eq.${termo}`,
-      );
-      if (!data || data.length === 0) {
+
+      let encontrado: PedidoEncontrado | null = (direto?.[0] as PedidoEncontrado) ?? null;
+
+      if (!encontrado) {
+        // Fallback: tenta localizar por Nota Fiscal já registrada em auditoria anterior.
+        const { data: porNf } = await supabase
+          .from("doca_auditorias")
+          .select("pedido_doca_id")
+          .eq("nota_fiscal", termo)
+          .limit(1);
+        if (porNf && porNf.length > 0) {
+          pedidoDocaId = (porNf[0] as any).pedido_doca_id;
+          const { data: pedidoPorNf } = await supabase
+            .from("pedidos_doca")
+            .select("id, nu_pedido_origem, nu_doc_erp, cd_rota, cd_classe, qtde_contar")
+            .eq("id", pedidoDocaId)
+            .limit(1);
+          encontrado = (pedidoPorNf?.[0] as PedidoEncontrado) ?? null;
+        }
+      }
+
+      if (!encontrado) {
         toast.error("Pedido não encontrado para Rota/Pedido/Nota Fiscal informado.");
         setPedido(null);
         return;
       }
-      const encontrado = data[0] as PedidoEncontrado;
+
       setPedido(encontrado);
+
+      const { data: auditoriaAnterior } = await supabase
+        .from("doca_auditorias")
+        .select("status")
+        .eq("pedido_doca_id", encontrado.id)
+        .eq("is_current", true)
+        .is("deleted_at", null)
+        .in("status", ["finalizado_sem_divergencia", "finalizado_com_divergencia"])
+        .maybeSingle();
+      if (auditoriaAnterior) {
+        toast.message("Este pedido já possui auditoria concluída. Esta será uma REAUDITORIA (histórico preservado).");
+      }
+
       const resp = await iniciarAuditoria({
         data: { pedidoDocaId: encontrado.id, conferente: { userId: user.userId, matricula: user.matricula, nome: user.nome } },
       } as any);
@@ -143,6 +177,7 @@ function AuditarPage() {
         {!pedido && (
           <div className="space-y-3">
             <label className="block text-sm font-medium text-foreground">Rota, Pedido ou Nota Fiscal</label>
+            <p className="text-xs text-muted-foreground -mt-1">A Nota Fiscal só é localizável após já ter sido informada em alguma auditoria.</p>
             <div className="flex gap-2">
               <input
                 autoFocus
