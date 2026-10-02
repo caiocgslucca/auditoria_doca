@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
+import { calcularQtdeContar } from "./rules";
 
 /**
  * Colunas EXATAS do novo arquivo de importação (34 colunas).
@@ -160,6 +161,15 @@ export const efetivarImportacaoParaOperacional = createServerFn({ method: "POST"
 
     let pedidoDocaId = existente?.id as string | undefined;
 
+    const qtdeContar = calcularQtdeContar({
+      cd_classe: primeira.cd_classe ?? null,
+      qt_produto: primeira.qt_produto ?? null,
+      qt_separado: primeira.qt_separado ?? null,
+      qt_cancelado: primeira.qt_cancelado ?? null,
+      qtd_pendente: primeira.qtd_pendente ?? null,
+      nu_contenedor: primeira.nu_contenedor ?? null,
+    });
+
     const payloadPedido = {
       nu_pedido_origem: pedido,
       nu_doc_erp: primeira.nu_doc_erp ?? null,
@@ -177,6 +187,7 @@ export const efetivarImportacaoParaOperacional = createServerFn({ method: "POST"
       status_separacao: primeira.status_separacao ?? null,
       data_integracao: primeira.data_integracao ?? null,
       data_separacao: primeira.data_separacao ?? null,
+      qtde_contar: qtdeContar,
     };
 
     if (!pedidoDocaId) {

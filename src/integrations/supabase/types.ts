@@ -117,7 +117,7 @@ export type Database = {
         Row: {
           id: string;
           pedido_doca_id: string;
-          rota: number | null;
+          rota: string | null;
           pedido: string;
           nota_fiscal: string | null;
           classe: string | null;
@@ -125,7 +125,7 @@ export type Database = {
           qtde_contada: number | null;
           dif: number | null;
           percentual_dif: number | null;
-          status: "em_andamento" | "finalizado_sem_divergencia" | "finalizado_com_divergencia";
+          status: "pendente" | "em_andamento" | "finalizado_sem_divergencia" | "finalizado_com_divergencia";
           user_id_conferente: string | null;
           matricula_conferente: string | null;
           nome_conferente: string | null;
