@@ -18,6 +18,8 @@ interface AuditoriaResumo {
   nome_conferente: string | null;
   pedido_doca_id: string;
   data_hora_finalizacao: string | null;
+  qtde_contar: number;
+  qtde_contada: number | null;
 }
 
 interface SeparadorResumo {
@@ -49,12 +51,13 @@ function DashboardPage() {
   const [filtroRota, setFiltroRota] = useState("");
   const [filtroConferente, setFiltroConferente] = useState("");
   const [filtroSeparador, setFiltroSeparador] = useState("");
+  const [filtroStatus, setFiltroStatus] = useState("");
 
   async function carregar() {
     setErro(null);
     let query = supabase
       .from("doca_auditorias")
-      .select("id, classe, rota, status, matricula_conferente, nome_conferente, pedido_doca_id, data_hora_finalizacao")
+      .select("id, classe, rota, status, matricula_conferente, nome_conferente, pedido_doca_id, data_hora_finalizacao, qtde_contar, qtde_contada")
       .is("deleted_at", null)
       .eq("is_current", true)
       .neq("status", "pendente");
@@ -62,6 +65,7 @@ function DashboardPage() {
     if (filtroClasse) query = query.eq("classe", filtroClasse);
     if (filtroRota) query = query.eq("rota", filtroRota);
     if (filtroConferente) query = query.ilike("nome_conferente", `%${filtroConferente}%`);
+    if (filtroStatus) query = query.eq("status", filtroStatus);
     if (filtroDe) query = query.gte("data_hora_finalizacao", new Date(filtroDe + "T00:00:00").toISOString());
     if (filtroAte) query = query.lte("data_hora_finalizacao", new Date(filtroAte + "T23:59:59").toISOString());
 
@@ -105,12 +109,20 @@ function DashboardPage() {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [filtroDe, filtroAte, filtroClasse, filtroRota, filtroConferente, filtroSeparador]);
+  }, [filtroDe, filtroAte, filtroClasse, filtroRota, filtroConferente, filtroSeparador, filtroStatus]);
 
   const totalAuditado = auditorias?.length ?? 0;
   const semDivergencia = auditorias?.filter((a) => a.status === "finalizado_sem_divergencia").length ?? 0;
   const comDivergencia = auditorias?.filter((a) => a.status === "finalizado_com_divergencia").length ?? 0;
   const acuracidade = totalAuditado > 0 ? (semDivergencia / totalAuditado) * 100 : 0;
+  // Soma real das diferencas absolutas (itens), calculada a partir dos
+  // dados persistidos de qtde_contar/qtde_contada - nao e um valor fixo.
+  const totalItensDivergentes = useMemo(() => {
+    return (auditorias ?? []).reduce((acc, a) => {
+      if (a.qtde_contada === null || a.qtde_contada === undefined) return acc;
+      return acc + Math.abs(a.qtde_contada - a.qtde_contar);
+    }, 0);
+  }, [auditorias]);
 
   const porClasse = useMemo(() => {
     const mapa = new Map<string, { total: number; divergente: number }>();
@@ -289,6 +301,14 @@ function DashboardPage() {
           <label className="text-xs text-muted-foreground">Separador</label>
           <input value={filtroSeparador} onChange={(e) => setFiltroSeparador(e.target.value)} className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground" />
         </div>
+        <div className="space-y-1">
+          <label className="text-xs text-muted-foreground">Status</label>
+          <select value={filtroStatus} onChange={(e) => setFiltroStatus(e.target.value)} className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground">
+            <option value="">Todos</option>
+            <option value="finalizado_sem_divergencia">Finalizado S/Dvg.</option>
+            <option value="finalizado_com_divergencia">Finalizado C/Dvg.</option>
+          </select>
+        </div>
       </div>
 
       {auditorias === null ? (
@@ -311,6 +331,10 @@ function DashboardPage() {
             <div className="rounded-lg border border-border bg-card p-4">
               <p className="text-xs text-muted-foreground">ACURACIDADE</p>
               <p className="text-2xl font-semibold text-primary mt-1">{acuracidade.toFixed(1).replace(".", ",")}%</p>
+            </div>
+            <div className="rounded-lg border border-border bg-card p-4">
+              <p className="text-xs text-muted-foreground">ITENS DIVERGENTES (ABS)</p>
+              <p className="text-2xl font-semibold text-destructive mt-1">{totalItensDivergentes}</p>
             </div>
           </div>
 

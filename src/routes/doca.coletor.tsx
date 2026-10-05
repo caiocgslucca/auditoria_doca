@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { ClipboardCheck, Search, LogOut } from "lucide-react";
 import { useAuthUser } from "@/lib/useAuthUser";
 import { supabase } from "@/integrations/supabase/client";
@@ -17,10 +17,27 @@ export const Route = createFileRoute("/doca/coletor")({
 function ColetorHome() {
   const { user, loading } = useAuthUser();
   const navigate = useNavigate();
+  const [pendentes, setPendentes] = useState<number | null>(null);
+  const [totalPedidos, setTotalPedidos] = useState<number | null>(null);
 
   useEffect(() => {
     if (!loading && !user) navigate({ to: "/auth" });
   }, [loading, user, navigate]);
+
+  useEffect(() => {
+    if (!user) return;
+    supabase
+      .from("pedidos_doca")
+      .select("id", { count: "exact", head: true })
+      .eq("status_atual", "pendente")
+      .then(({ count }) => setPendentes(count ?? 0));
+    // Total geral de pedidos operacionais, usado no subtitulo de CONSULTA
+    // para dar contexto real de volume de dados consultaveis (Rota/Pedido/NF).
+    supabase
+      .from("pedidos_doca")
+      .select("id", { count: "exact", head: true })
+      .then(({ count }) => setTotalPedidos(count ?? 0));
+  }, [user]);
 
   async function sair() {
     await supabase.auth.signOut();
@@ -52,7 +69,9 @@ function ColetorHome() {
         >
           <ClipboardCheck className="size-10" />
           AUDITAR
-          <span className="text-sm font-normal opacity-90">Realizar auditoria</span>
+          <span className="text-sm font-normal opacity-90">
+            {pendentes !== null ? `${pendentes} pedido(s) pendente(s)` : "Realizar auditoria"}
+          </span>
         </Link>
 
         <Link
@@ -61,7 +80,9 @@ function ColetorHome() {
         >
           <Search className="size-10" />
           CONSULTA
-          <span className="text-sm font-normal opacity-80">Consultar pedidos</span>
+          <span className="text-sm font-normal opacity-80">
+            {totalPedidos !== null ? `${totalPedidos} pedido(s) disponiveis para busca` : "Consultar pedidos"}
+          </span>
         </Link>
       </div>
 

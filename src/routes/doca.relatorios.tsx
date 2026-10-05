@@ -55,6 +55,7 @@ function RelatoriosPage() {
   const [filtroConferente, setFiltroConferente] = useState("");
   const [filtroSeparador, setFiltroSeparador] = useState("");
   const [filtroStatus, setFiltroStatus] = useState("");
+  const [buscaLivre, setBuscaLivre] = useState("");
 
   async function carregar() {
     setErro(null);
@@ -109,6 +110,18 @@ function RelatoriosPage() {
       });
     }
 
+    // Busca livre: aplica filtro adicional em memoria cruzando Rota, Pedido
+    // e Nota Fiscal simultaneamente (complementar aos filtros de campo unico).
+    if (buscaLivre.trim()) {
+      const termo = buscaLivre.trim().toLowerCase();
+      resultado = resultado.filter(
+        (l) =>
+          (l.rota ?? "").toLowerCase().includes(termo) ||
+          l.pedido.toLowerCase().includes(termo) ||
+          (l.nota_fiscal ?? "").toLowerCase().includes(termo),
+      );
+    }
+
     setSeparadoresPorPedido(mapaSeparadores);
     setLinhas(resultado);
 
@@ -143,7 +156,19 @@ function RelatoriosPage() {
 
   useEffect(() => {
     carregar();
-  }, [filtroDe, filtroAte, filtroRota, filtroPedido, filtroNf, filtroClasse, filtroConferente, filtroSeparador, filtroStatus]);
+  }, [filtroDe, filtroAte, filtroRota, filtroPedido, filtroNf, filtroClasse, filtroConferente, filtroSeparador, filtroStatus, buscaLivre]);
+
+  function limparFiltros() {
+    setFiltroDe("");
+    setFiltroAte("");
+    setFiltroRota("");
+    setFiltroPedido("");
+    setFiltroNf("");
+    setFiltroClasse("");
+    setFiltroConferente("");
+    setFiltroSeparador("");
+    setFiltroStatus("");
+  }
 
   function exportarXLSX() {
     const linhasExport = (linhas ?? []).map((l) => ({
@@ -175,14 +200,22 @@ function RelatoriosPage() {
           <h1 className="text-2xl font-semibold text-foreground">Relatórios</h1>
           <p className="text-sm text-muted-foreground">Dados operacionais persistidos (independentes do staging temporário).</p>
         </div>
-        <button
-          onClick={exportarXLSX}
-          disabled={!linhas || linhas.length === 0}
-          className="inline-flex items-center gap-2 rounded-md bg-primary px-3 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-60"
-        >
-          <Download className="size-4" />
-          Exportar XLSX
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={limparFiltros}
+            className="inline-flex items-center gap-2 rounded-md border border-input px-3 py-2 text-sm font-medium text-foreground hover:bg-muted"
+          >
+            Limpar Filtros
+          </button>
+          <button
+            onClick={exportarXLSX}
+            disabled={!linhas || linhas.length === 0}
+            className="inline-flex items-center gap-2 rounded-md bg-primary px-3 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-60"
+          >
+            <Download className="size-4" />
+            Exportar XLSX
+          </button>
+        </div>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3">
@@ -217,6 +250,10 @@ function RelatoriosPage() {
         <div className="space-y-1">
           <label className="text-xs text-muted-foreground">Separador</label>
           <input value={filtroSeparador} onChange={(e) => setFiltroSeparador(e.target.value)} className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground" />
+        </div>
+        <div className="space-y-1">
+          <label className="text-xs text-muted-foreground">Busca livre (Rota/Pedido/NF)</label>
+          <input value={buscaLivre} onChange={(e) => setBuscaLivre(e.target.value)} placeholder="Buscar..." className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground" />
         </div>
         <div className="space-y-1">
           <label className="text-xs text-muted-foreground">Status</label>

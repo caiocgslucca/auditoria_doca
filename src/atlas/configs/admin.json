@@ -1,0 +1,73 @@
+{
+  "schemaVersion": 1,
+  "templateId": "admin",
+  "locale": "pt-BR",
+  "branding": {
+    "name": "Nexo Admin",
+    "shortName": "NA",
+    "tagline": "CONTROLE, COM CLAREZA"
+  },
+  "theme": {
+    "mode": "light",
+    "accent": "#3676e6",
+    "accentText": "#ffffff",
+    "background": "#f4f6f8",
+    "surface": "#ffffff",
+    "text": "#18232d",
+    "muted": "#73808e",
+    "line": "#152a3b12",
+    "serif": false,
+    "radius": 14
+  },
+  "content": {
+    "headline": "Visão geral",
+    "description": "Tudo o que acontece na sua operação, em um só lugar.",
+    "eyebrow": "CONTROLE, COM CLAREZA",
+    "cta": "Começar agora",
+    "heroImage": ""
+  },
+  "collections": {
+    "users": [
+      {
+        "id": "1",
+        "title": "Marina Costa",
+        "email": "marina@example.com",
+        "role": "Administrador",
+        "status": "Ativo",
+        "date": "12 set. 2026"
+      },
+      {
+        "id": "2",
+        "title": "Rafael Lima",
+        "email": "rafael@example.com",
+        "role": "Editor",
+        "status": "Ativo",
+        "date": "14 set. 2026"
+      },
+      {
+        "id": "3",
+        "title": "Clara Alves",
+        "email": "clara@example.com",
+        "role": "Membro",
+        "status": "Convidado",
+        "date": "18 set. 2026"
+      },
+      {
+        "id": "4",
+        "title": "Pedro Rocha",
+        "email": "pedro@example.com",
+        "role": "Membro",
+        "status": "Ativo",
+        "date": "19 set. 2026"
+      },
+      {
+        "id": "5",
+        "title": "Júlia Mendes",
+        "email": "julia@example.com",
+        "role": "Editor",
+        "status": "Suspenso",
+        "date": "20 set. 2026"
+      }
+    ]
+  }
+}

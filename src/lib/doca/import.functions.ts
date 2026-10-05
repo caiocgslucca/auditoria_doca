@@ -226,7 +226,7 @@ export const efetivarImportacaoParaOperacional = createServerFn({ method: "POST"
     for (const sep of separadoresUnicos.values()) {
       const { data: jaExiste } = await supabase
         .from("doca_pedido_separadores")
-        .select("id")
+        .select("id, nm_funcionario")
         .eq("pedido_doca_id", pedidoDocaId)
         .eq("cd_funcionario", sep.cd)
         .maybeSingle();
@@ -237,6 +237,15 @@ export const efetivarImportacaoParaOperacional = createServerFn({ method: "POST"
           nm_funcionario: sep.nm,
         } as any);
         if (errSep) throw new Error(errSep.message);
+        separadoresPersistidos += 1;
+      } else if (sep.nm && (jaExiste as any).nm_funcionario !== sep.nm) {
+        // Garante que NM_FUNCIONARIO fique sempre sincronizado com a última
+        // importação para o mesmo CD_FUNCIONARIO (nunca fica desatualizado).
+        const { error: errUpdateSep } = await supabase
+          .from("doca_pedido_separadores")
+          .update({ nm_funcionario: sep.nm } as any)
+          .eq("id", (jaExiste as any).id);
+        if (errUpdateSep) throw new Error(errUpdateSep.message);
         separadoresPersistidos += 1;
       }
     }

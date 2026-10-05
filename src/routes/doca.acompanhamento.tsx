@@ -7,6 +7,8 @@ import {
   formatarPercentualDif,
   formatarMatriculaNome,
   labelStatus,
+  calcularDif,
+  calcularPercentualDif,
 } from "@/lib/doca/rules";
 import {
   excluirAuditoria,
@@ -65,6 +67,9 @@ function AcompanhamentoPage() {
   const [editando, setEditando] = useState<LinhaAuditoria | null>(null);
   const [observando, setObservando] = useState<LinhaAuditoria | null>(null);
   const [vendoFotos, setVendoFotos] = useState<LinhaAuditoria | null>(null);
+  const [filtroRota, setFiltroRota] = useState("");
+  const [filtroPedido, setFiltroPedido] = useState("");
+  const [filtroNf, setFiltroNf] = useState("");
 
   async function carregar() {
     setErro(null);
@@ -152,13 +157,42 @@ function AcompanhamentoPage() {
     }
   }
 
-  const linhasOrdenadas = useMemo(() => linhas ?? [], [linhas]);
+  const linhasOrdenadas = useMemo(() => {
+    const base = linhas ?? [];
+    return base.filter((l) => {
+      if (filtroRota && !(l.rota ?? "").toLowerCase().includes(filtroRota.toLowerCase())) return false;
+      if (filtroPedido && !l.pedido.toLowerCase().includes(filtroPedido.toLowerCase())) return false;
+      if (filtroNf && !(l.nota_fiscal ?? "").toLowerCase().includes(filtroNf.toLowerCase())) return false;
+      return true;
+    });
+  }, [linhas, filtroRota, filtroPedido, filtroNf]);
 
   return (
     <div className="p-6 space-y-5">
       <div>
         <h1 className="text-2xl font-semibold text-foreground">Acompanhamento</h1>
         <p className="text-sm text-muted-foreground">Auditorias de inventário de doca em tempo real.</p>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <input
+          value={filtroRota}
+          onChange={(e) => setFiltroRota(e.target.value)}
+          placeholder="Filtrar por Rota"
+          className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground"
+        />
+        <input
+          value={filtroPedido}
+          onChange={(e) => setFiltroPedido(e.target.value)}
+          placeholder="Filtrar por Pedido"
+          className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground"
+        />
+        <input
+          value={filtroNf}
+          onChange={(e) => setFiltroNf(e.target.value)}
+          placeholder="Filtrar por Nota Fiscal"
+          className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground"
+        />
       </div>
 
       <div className="overflow-x-auto rounded-lg border border-border bg-card">
@@ -192,7 +226,7 @@ function AcompanhamentoPage() {
                 <td colSpan={12} className="px-3 py-8 text-center text-destructive">{erro}</td>
               </tr>
             )}
-            {linhas !== null && linhas.length === 0 && !erro && (
+            {linhas !== null && linhasOrdenadas.length === 0 && !erro && (
               <tr>
                 <td colSpan={12} className="px-3 py-8 text-center text-muted-foreground">
                   Nenhum registro encontrado para os filtros selecionados.
@@ -204,7 +238,13 @@ function AcompanhamentoPage() {
               const resumoObs = obsPorAuditoria[l.id];
               const separadores = separadoresPorPedido[l.pedido_doca_id] ?? [];
               const primeiroSeparador = separadores[0];
-              const divergente = l.status === "finalizado_com_divergencia";
+              // Dif/%Dif calculados em tela (nunca apenas exibindo valor cru do
+              // banco) para garantir Dif = Qtde Contada - Qtde Contar e
+              // %Dif = Dif / Qtde Contar * 100, mesmo que o dado armazenado
+              // esteja desatualizado em relacao a uma edicao manual recente.
+              const difCalculado = calcularDif(l.qtde_contar, l.qtde_contada);
+              const percentualCalculado = calcularPercentualDif(l.qtde_contar, l.qtde_contada);
+              const divergente = difCalculado !== null && difCalculado !== 0;
               return (
                 <tr key={l.id} className="border-t border-border hover:bg-muted/30">
                   <td className="px-3 py-2 whitespace-nowrap text-foreground">{formatarDataHora(l.data_hora_finalizacao)}</td>
@@ -229,10 +269,10 @@ function AcompanhamentoPage() {
                   <td className="px-3 py-2 text-right whitespace-nowrap text-foreground">{l.qtde_contar}</td>
                   <td className="px-3 py-2 text-right whitespace-nowrap text-foreground">{l.qtde_contada ?? "-"}</td>
                   <td className={"px-3 py-2 text-right whitespace-nowrap font-medium " + (divergente ? "text-destructive" : "text-foreground")}>
-                    {formatarDif(l.dif)}
+                    {formatarDif(difCalculado)}
                   </td>
                   <td className={"px-3 py-2 text-right whitespace-nowrap font-medium " + (divergente ? "text-destructive" : "text-foreground")}>
-                    {formatarPercentualDif(l.percentual_dif)}
+                    {formatarPercentualDif(percentualCalculado)}
                   </td>
                   <td className="px-3 py-2 whitespace-nowrap text-foreground">
                     {formatarMatriculaNome(l.matricula_conferente, l.nome_conferente)}
