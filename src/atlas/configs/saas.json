@@ -1,0 +1,79 @@
+{
+  "schemaVersion": 1,
+  "templateId": "saas",
+  "locale": "pt-BR",
+  "branding": {
+    "name": "Fluxo",
+    "shortName": "F",
+    "tagline": "MENOS ATRITO. MAIS ENTREGA."
+  },
+  "theme": {
+    "mode": "dark",
+    "accent": "#79a6f5",
+    "accentText": "#ffffff",
+    "background": "#0c1422",
+    "surface": "#142139",
+    "text": "#eef3f2",
+    "muted": "#95a7ac",
+    "line": "#ffffff16",
+    "serif": false,
+    "radius": 14
+  },
+  "content": {
+    "headline": "Seu time em fluxo.\nSeu trabalho em movimento.",
+    "description": "Conecte projetos, conversas e entregas em um espaço que acompanha o seu ritmo.",
+    "eyebrow": "MENOS ATRITO. MAIS ENTREGA.",
+    "cta": "Começar agora",
+    "heroImage": ""
+  },
+  "collections": {
+    "plans": [
+      {
+        "id": "1",
+        "title": "Essencial",
+        "price": 39,
+        "description": "Para organizar o seu primeiro time.",
+        "category": "3 pessoas",
+        "tag": "Comece aqui"
+      },
+      {
+        "id": "2",
+        "title": "Pro",
+        "price": 89,
+        "description": "Para equipes que querem ir além.",
+        "category": "15 pessoas",
+        "tag": "Mais completo"
+      },
+      {
+        "id": "3",
+        "title": "Business",
+        "price": 179,
+        "description": "Para operações com mais frentes.",
+        "category": "50 pessoas"
+      }
+    ],
+    "tasks": [
+      {
+        "id": "1",
+        "title": "Nova página de produto",
+        "status": "Em revisão",
+        "person": "Marina",
+        "progress": 75
+      },
+      {
+        "id": "2",
+        "title": "Campanha de lançamento",
+        "status": "Em andamento",
+        "person": "Rafael",
+        "progress": 42
+      },
+      {
+        "id": "3",
+        "title": "Pesquisa com clientes",
+        "status": "Concluído",
+        "person": "Clara",
+        "progress": 100
+      }
+    ]
+  }
+}
