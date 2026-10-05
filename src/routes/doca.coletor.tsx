@@ -4,6 +4,11 @@ import { ClipboardCheck, Search, LogOut } from "lucide-react";
 import { useAuthUser } from "@/lib/useAuthUser";
 import { supabase } from "@/integrations/supabase/client";
 
+// HOME mobile-first do Coletor: autentica o usuário e exibe apenas as duas
+// ações operacionais (AUDITAR e CONSULTA). AUDITAR delega para
+// /doca/coletor/auditar (foto -> Supabase Storage, cálculo de Dif/%Dif via
+// finalizarAuditoria). CONSULTA delega para /doca/coletor/consulta
+// (leitura por Rota/Pedido/NF).
 export const Route = createFileRoute("/doca/coletor")({
   head: () => ({ meta: [{ title: "Coletor — Inventário Doca" }] }),
   component: ColetorHome,

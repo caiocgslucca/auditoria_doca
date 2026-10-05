@@ -34,6 +34,11 @@ function formatarDataHora(iso: string | null): string {
   return `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
 }
 
+// Relatórios segue EXATAMENTE o modelo de colunas do Acompanhamento:
+// Data/Hora Bipado, Rota, Pedido, NF, Classe, Qtde Contar, Qtde Contada,
+// Dif, %Dif, Conferente, Separador, Observação, Fotos, Status — com
+// filtros de Período/Rota/Pedido/NF/Classe/Conferente/Separador/Status e
+// exportação XLSX que respeita os filtros aplicados.
 function RelatoriosPage() {
   const [linhas, setLinhas] = useState<LinhaRelatorio[] | null>(null);
   const [erro, setErro] = useState<string | null>(null);

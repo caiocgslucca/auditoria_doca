@@ -33,6 +33,11 @@ function formatarDataHora(iso: string | null): string {
   return `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
 }
 
+// Dashboard consome doca_auditorias (dados reais persistidos, nunca fake):
+// cards TOTAL AUDITADO / SEM DIVERGÊNCIA / COM DIVERGÊNCIA / ACURACIDADE,
+// filtros Período/Classe/Rota/Conferente/Separador, e análises por Status,
+// Classe, Conferente, Separador e Divergências por Classe. PDF respeita os
+// mesmos filtros aplicados na tela.
 function DashboardPage() {
   const [auditorias, setAuditorias] = useState<AuditoriaResumo[] | null>(null);
   const [separadores, setSeparadores] = useState<SeparadorResumo[]>([]);

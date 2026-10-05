@@ -132,6 +132,10 @@ export const importarParaTemporario = createServerFn({ method: "POST" })
  * (CD_FUNCIONARIO + NM_FUNCIONARIO) em doca_pedido_separadores.
  * Essa persistência é definitiva: limpar o staging NUNCA remove isso.
  */
+// Persiste definitivamente o(s) Separador(es) (CD_FUNCIONARIO + NM_FUNCIONARIO)
+// de cada pedido do staging em doca_pedido_separadores, vinculados ao
+// pedido operacional (pedidos_doca). Essa gravação SOBREVIVE a qualquer
+// "Limpar Dados do Dia" (que afeta somente pedidos_doca_temp).
 export const efetivarImportacaoParaOperacional = createServerFn({ method: "POST" }).handler(async () => {
   const { data: temp, error: errTemp } = await supabase.from("pedidos_doca_temp").select("*");
   if (errTemp) throw new Error(errTemp.message);

@@ -264,50 +264,58 @@ function TemporarioPage() {
         <table className="w-full text-sm">
           <thead className="bg-muted/50 text-muted-foreground">
             <tr>
-              <th className="px-3 py-2 text-left font-medium whitespace-nowrap">Pedido</th>
+              <th className="px-3 py-2 text-left font-medium whitespace-nowrap">DATA INTEGRAÇÃO</th>
+              <th className="px-3 py-2 text-left font-medium whitespace-nowrap">DATA LIB ONDA</th>
               <th className="px-3 py-2 text-left font-medium whitespace-nowrap">NU_DOC_ERP</th>
-              <th className="px-3 py-2 text-left font-medium whitespace-nowrap">Onda</th>
-              <th className="px-3 py-2 text-left font-medium whitespace-nowrap">Rota</th>
-              <th className="px-3 py-2 text-left font-medium whitespace-nowrap">Classe</th>
-              <th className="px-3 py-2 text-left font-medium whitespace-nowrap">Produto</th>
-              <th className="px-3 py-2 text-right font-medium whitespace-nowrap">Qtd Produto</th>
-              <th className="px-3 py-2 text-right font-medium whitespace-nowrap">Qtd Separado</th>
-              <th className="px-3 py-2 text-right font-medium whitespace-nowrap">Qtd Cancelado</th>
-              <th className="px-3 py-2 text-right font-medium whitespace-nowrap">Qtd Pendente</th>
-              <th className="px-3 py-2 text-left font-medium whitespace-nowrap">Matrícula Separador</th>
-              <th className="px-3 py-2 text-left font-medium whitespace-nowrap">Nome Separador</th>
-              <th className="px-3 py-2 text-left font-medium whitespace-nowrap">Data Separação</th>
-              <th className="px-3 py-2 text-left font-medium whitespace-nowrap">Status Separação</th>
-              <th className="px-3 py-2 text-left font-medium whitespace-nowrap">Nu Separação</th>
-              <th className="px-3 py-2 text-left font-medium whitespace-nowrap">Contenedor</th>
-              <th className="px-3 py-2 text-left font-medium whitespace-nowrap">Onda (desc.)</th>
+              <th className="px-3 py-2 text-left font-medium whitespace-nowrap">NU_PEDIDO_ORIGEM</th>
+              <th className="px-3 py-2 text-left font-medium whitespace-nowrap">CD_ONDA</th>
+              <th className="px-3 py-2 text-left font-medium whitespace-nowrap">CD_ROTA</th>
+              <th className="px-3 py-2 text-left font-medium whitespace-nowrap">CD_CLASSE</th>
+              <th className="px-3 py-2 text-left font-medium whitespace-nowrap">CD_ENDERECO</th>
+              <th className="px-3 py-2 text-left font-medium whitespace-nowrap">CD_PRODUTO</th>
+              <th className="px-3 py-2 text-left font-medium whitespace-nowrap">DS_PRODUTO</th>
+              <th className="px-3 py-2 text-right font-medium whitespace-nowrap">QT_PRODUTO</th>
+              <th className="px-3 py-2 text-right font-medium whitespace-nowrap">QT_SEPARADO</th>
+              <th className="px-3 py-2 text-right font-medium whitespace-nowrap">QT_CANCELADO</th>
+              <th className="px-3 py-2 text-right font-medium whitespace-nowrap">QTD_PENDENTE</th>
+              <th className="px-3 py-2 text-left font-medium whitespace-nowrap">CD_FUNCIONARIO</th>
+              <th className="px-3 py-2 text-left font-medium whitespace-nowrap">NM_FUNCIONARIO</th>
+              <th className="px-3 py-2 text-left font-medium whitespace-nowrap">DATA SEPARAÇÃO</th>
+              <th className="px-3 py-2 text-left font-medium whitespace-nowrap">STATUS_SEPARACAO</th>
+              <th className="px-3 py-2 text-left font-medium whitespace-nowrap">NU_SEPARACAO</th>
+              <th className="px-3 py-2 text-left font-medium whitespace-nowrap">NU_CONTENEDOR</th>
+              <th className="px-3 py-2 text-left font-medium whitespace-nowrap">DS_ONDA</th>
             </tr>
           </thead>
           <tbody>
             {linhas === null && !erro && (
               <tr>
-                <td colSpan={17} className="px-3 py-8 text-center text-muted-foreground">Carregando registros...</td>
+                <td colSpan={21} className="px-3 py-8 text-center text-muted-foreground">Carregando registros...</td>
               </tr>
             )}
             {erro && (
               <tr>
-                <td colSpan={17} className="px-3 py-8 text-center text-destructive">{erro}</td>
+                <td colSpan={21} className="px-3 py-8 text-center text-destructive">{erro}</td>
               </tr>
             )}
             {linhas !== null && linhas.length === 0 && !erro && (
               <tr>
-                <td colSpan={17} className="px-3 py-8 text-center text-muted-foreground">
+                <td colSpan={21} className="px-3 py-8 text-center text-muted-foreground">
                   Nenhum registro na área temporária.
                 </td>
               </tr>
             )}
             {linhas?.map((l) => (
               <tr key={l.id} className="border-t border-border hover:bg-muted/30">
-                <td className="px-3 py-2 whitespace-nowrap text-foreground">{l.nu_pedido_origem}</td>
+                <td className="px-3 py-2 whitespace-nowrap text-foreground">{l.data_integracao ?? "-"}</td>
+                <td className="px-3 py-2 whitespace-nowrap text-foreground">{l.data_lib_onda ?? "-"}</td>
                 <td className="px-3 py-2 whitespace-nowrap text-foreground">{l.nu_doc_erp ?? "-"}</td>
+                <td className="px-3 py-2 whitespace-nowrap text-foreground">{l.nu_pedido_origem}</td>
                 <td className="px-3 py-2 whitespace-nowrap text-foreground">{l.cd_onda ?? "-"}</td>
                 <td className="px-3 py-2 whitespace-nowrap text-foreground">{l.cd_rota ?? "-"}</td>
                 <td className="px-3 py-2 whitespace-nowrap text-foreground">{l.cd_classe ?? "-"}</td>
+                <td className="px-3 py-2 whitespace-nowrap text-foreground">{l.cd_endereco ?? "-"}</td>
+                <td className="px-3 py-2 whitespace-nowrap text-foreground">{l.cd_produto ?? "-"}</td>
                 <td className="px-3 py-2 whitespace-nowrap text-foreground">{l.ds_produto ?? "-"}</td>
                 <td className="px-3 py-2 text-right whitespace-nowrap text-foreground">{l.qt_produto ?? "-"}</td>
                 <td className="px-3 py-2 text-right whitespace-nowrap text-foreground">{l.qt_separado ?? "-"}</td>
