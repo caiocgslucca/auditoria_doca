@@ -4,6 +4,7 @@ import { ArrowLeft, Search as SearchIcon, Camera, BookOpen, X } from "lucide-rea
 import { useAuthUser } from "@/lib/useAuthUser";
 import { supabase } from "@/integrations/supabase/client";
 import { formatarDif, formatarPercentualDif, formatarMatriculaNome, labelStatus } from "@/lib/doca/rules";
+import { listarFotosAuditoria, listarObservacoesAuditoria } from "@/lib/doca/auditoria.functions";
 
 export const Route = createFileRoute("/doca/coletor/consulta")({
   head: () => ({ meta: [{ title: "Consulta — Coletor Inventário Doca" }] }),
@@ -226,18 +227,9 @@ function ModalFotosConsulta({ resultado, onClose }: { resultado: ResultadoConsul
   const [erro, setErro] = useState<string | null>(null);
 
   useEffect(() => {
-    supabase
-      .from("doca_auditoria_fotos")
-      .select("id, url")
-      .eq("auditoria_id", resultado.id)
-      .is("deleted_at", null)
-      .then(({ data, error }) => {
-        if (error) {
-          setErro("Não foi possível carregar as fotos.");
-          return;
-        }
-        setFotos((data ?? []) as { id: string; url: string | null }[]);
-      });
+    listarFotosAuditoria({ data: { auditoriaId: resultado.id } } as any)
+      .then((r: any) => setFotos(r))
+      .catch(() => setErro("Não foi possível carregar as fotos."));
   }, [resultado.id]);
 
   return (
@@ -273,27 +265,9 @@ function ModalObservacoesConsulta({ resultado, onClose }: { resultado: Resultado
   const [erro, setErro] = useState<string | null>(null);
 
   useEffect(() => {
-    supabase
-      .from("doca_auditoria_observacoes")
-      .select("id, observacao, matricula, nome, created_at")
-      .eq("auditoria_id", resultado.id)
-      .is("deleted_at", null)
-      .order("created_at", { ascending: true })
-      .then(({ data, error }) => {
-        if (error) {
-          setErro("Não foi possível carregar as observações.");
-          return;
-        }
-        setObs(
-          (data ?? []) as {
-            id: string;
-            observacao: string;
-            matricula: string | null;
-            nome: string | null;
-            created_at: string;
-          }[],
-        );
-      });
+    listarObservacoesAuditoria({ data: { auditoriaId: resultado.id } } as any)
+      .then((r: any) => setObs(r))
+      .catch(() => setErro("Não foi possível carregar as observações."));
   }, [resultado.id]);
 
   return (
