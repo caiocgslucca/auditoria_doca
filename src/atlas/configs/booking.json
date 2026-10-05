@@ -1,0 +1,83 @@
+{
+  "schemaVersion": 1,
+  "templateId": "booking",
+  "locale": "pt-BR",
+  "branding": {
+    "name": "Agenda Clara",
+    "shortName": "AC",
+    "tagline": "MAIS TEMPO PARA O QUE IMPORTA"
+  },
+  "theme": {
+    "mode": "light",
+    "accent": "#326f95",
+    "accentText": "#ffffff",
+    "background": "#f3f6f5",
+    "surface": "#ffffff",
+    "text": "#18232d",
+    "muted": "#73808e",
+    "line": "#152a3b12",
+    "serif": false,
+    "radius": 14
+  },
+  "content": {
+    "headline": "Sua semana, com espaço para tudo.",
+    "description": "Gerencie horários e mantenha seus clientes por perto.",
+    "eyebrow": "MAIS TEMPO PARA O QUE IMPORTA",
+    "cta": "Começar agora",
+    "heroImage": ""
+  },
+  "collections": {
+    "appointments": [
+      {
+        "id": "1",
+        "title": "Corte & finalização",
+        "person": "Ana Souza",
+        "date": "2026-10-05",
+        "time": "09:00",
+        "duration": "60 min",
+        "category": "Camila",
+        "status": "Confirmado"
+      },
+      {
+        "id": "2",
+        "title": "Consultoria de imagem",
+        "person": "Júlia Melo",
+        "date": "2026-10-06",
+        "time": "10:00",
+        "duration": "60 min",
+        "category": "Rafael",
+        "status": "Confirmado"
+      },
+      {
+        "id": "3",
+        "title": "Design de sobrancelhas",
+        "person": "Bia Lima",
+        "date": "2026-10-07",
+        "time": "14:00",
+        "duration": "30 min",
+        "category": "Camila",
+        "status": "Pendente"
+      },
+      {
+        "id": "4",
+        "title": "Corte & barba",
+        "person": "Pedro Reis",
+        "date": "2026-10-08",
+        "time": "11:00",
+        "duration": "60 min",
+        "category": "Rafael",
+        "status": "Confirmado"
+      },
+      {
+        "id": "5",
+        "title": "Hidratação",
+        "person": "Lara Alves",
+        "date": "2026-10-09",
+        "time": "15:00",
+        "duration": "60 min",
+        "category": "Camila",
+        "status": "Confirmado"
+      }
+    ]
+  }
+}
