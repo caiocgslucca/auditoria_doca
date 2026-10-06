@@ -58,7 +58,7 @@ function ColetorHome() {
   return (
     <main className="min-h-screen bg-[hsl(var(--sidebar-background))] text-white flex flex-col">
       <header className="px-5 pt-8 pb-6">
-        <p className="text-sm text-white/70">Inventário Doca</p>
+        <p className="text-sm text-white/70">Coletor Doca • V2</p>
         <h1 className="text-2xl font-semibold mt-1">Olá, {nome}</h1>
       </header>
 

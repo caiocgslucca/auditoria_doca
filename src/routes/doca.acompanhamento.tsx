@@ -70,6 +70,9 @@ function AcompanhamentoPage() {
   const [filtroRota, setFiltroRota] = useState("");
   const [filtroPedido, setFiltroPedido] = useState("");
   const [filtroNf, setFiltroNf] = useState("");
+  const [filtroClasse, setFiltroClasse] = useState("");
+  const [filtroConferente, setFiltroConferente] = useState("");
+  const [filtroSeparador, setFiltroSeparador] = useState("");
 
   async function carregar() {
     setErro(null);
@@ -163,18 +166,30 @@ function AcompanhamentoPage() {
       if (filtroRota && !(l.rota ?? "").toLowerCase().includes(filtroRota.toLowerCase())) return false;
       if (filtroPedido && !l.pedido.toLowerCase().includes(filtroPedido.toLowerCase())) return false;
       if (filtroNf && !(l.nota_fiscal ?? "").toLowerCase().includes(filtroNf.toLowerCase())) return false;
+      if (filtroClasse && !(l.classe ?? "").toLowerCase().includes(filtroClasse.toLowerCase())) return false;
+      if (filtroConferente) {
+        const texto = `${l.matricula_conferente ?? ""} ${l.nome_conferente ?? ""}`.toLowerCase();
+        if (!texto.includes(filtroConferente.toLowerCase())) return false;
+      }
+      if (filtroSeparador) {
+        const separadores = separadoresPorPedido[l.pedido_doca_id] ?? [];
+        const encontrado = separadores.some((s) =>
+          `${s.cd_funcionario} ${s.nm_funcionario}`.toLowerCase().includes(filtroSeparador.toLowerCase()),
+        );
+        if (!encontrado) return false;
+      }
       return true;
     });
-  }, [linhas, filtroRota, filtroPedido, filtroNf]);
+  }, [linhas, filtroRota, filtroPedido, filtroNf, filtroClasse, filtroConferente, filtroSeparador, separadoresPorPedido]);
 
   return (
     <div className="p-6 space-y-5">
       <div>
-        <h1 className="text-2xl font-semibold text-foreground">Acompanhamento</h1>
+        <h1 className="text-2xl font-semibold text-foreground">Acompanhamento • V2</h1>
         <p className="text-sm text-muted-foreground">Auditorias de inventário de doca em tempo real.</p>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-6 gap-3">
         <input
           value={filtroRota}
           onChange={(e) => setFiltroRota(e.target.value)}
@@ -191,6 +206,24 @@ function AcompanhamentoPage() {
           value={filtroNf}
           onChange={(e) => setFiltroNf(e.target.value)}
           placeholder="Filtrar por Nota Fiscal"
+          className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground"
+        />
+        <input
+          value={filtroClasse}
+          onChange={(e) => setFiltroClasse(e.target.value)}
+          placeholder="Filtrar por Classe"
+          className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground"
+        />
+        <input
+          value={filtroConferente}
+          onChange={(e) => setFiltroConferente(e.target.value)}
+          placeholder="Filtrar por Conferente"
+          className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground"
+        />
+        <input
+          value={filtroSeparador}
+          onChange={(e) => setFiltroSeparador(e.target.value)}
+          placeholder="Filtrar por Separador"
           className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground"
         />
       </div>
